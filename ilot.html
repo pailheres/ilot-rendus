@@ -86,8 +86,13 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
       <button class="chip" id="v-cuisine" data-v="cuisine" aria-pressed="true">Côté cuisine</button>
       <button class="chip" id="v-tabourets" data-v="tabourets" aria-pressed="false">Côté tabourets</button>
       <button class="chip" id="v-dessus" data-v="dessus" aria-pressed="false">Dessus</button>
+      <button class="chip" id="v-lv" data-v="lv" aria-pressed="false">Lave-vaisselle</button>
       <button class="chip" id="v-prise1" data-v="prise1" aria-pressed="false">Prise tablettes</button>
       <button class="chip" id="v-prise2" data-v="prise2" aria-pressed="false">Prise bout frigo</button>
+    </div></div>
+    <div class="group"><span>Lave-vaisselle</span><div class="chips" data-group="dw">
+      <button class="chip" id="d-ferme" data-v="0" aria-pressed="true">Fermé</button>
+      <button class="chip" id="d-ouvert" data-v="1" aria-pressed="false">Ouvert</button>
     </div></div>
     <div class="group"><span>Tiroir à ustensiles</span><div class="chips" data-group="ut">
       <button class="chip" id="u-ferme" data-v="0" aria-pressed="true">Fermé</button>
@@ -121,14 +126,17 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
       <h2>Vue en plan</h2>
       <svg viewBox="-70 -62 620 520" role="img" aria-label="Plan de la cuisine avec l'îlot, les passages et les tabourets">
         <defs><marker id="tk" viewBox="-5 -5 10 10" markerWidth="9" markerHeight="9" orient="auto"><path d="M0,-4 L0,4"/></marker></defs>
-        <rect class="exist" x="90" y="-36" width="309" height="36"/>
-        <rect class="exist" x="180" y="-36" width="90" height="36" style="stroke:var(--muted)"/>
-        <text class="lbl" x="225" y="-14" text-anchor="middle">Cuisinière</text>
-        <text class="lbl" x="334" y="-14" text-anchor="middle">Comptoir</text>
-        <rect class="exist" x="0" y="-48" width="90" height="48"/>
-        <text class="lbl" x="45" y="-20" text-anchor="middle">Frigo</text>
-        <rect class="exist" x="474" y="-36" width="36" height="276"/>
-        <text class="lbl" x="492" y="110" text-anchor="middle" transform="rotate(90 492 110)">Évier · lave-vaisselle</text>
+        <rect class="exist" x="102" y="-36" width="259.5" height="36"/>
+        <rect class="exist" x="210" y="-36" width="90" height="36" style="stroke:var(--muted)"/>
+        <text class="lbl" x="255" y="-14" text-anchor="middle">Cuisinière</text>
+        <text class="lbl" x="156" y="-14" text-anchor="middle">Tiroirs 36″</text>
+        <rect class="exist" x="0" y="-48" width="102" height="48"/>
+        <text class="lbl" x="51" y="-20" text-anchor="middle">Frigo</text>
+        <rect class="exist" x="474" y="-36" width="36" height="243"/>
+        <rect class="exist" x="474" y="-30" width="36" height="72" style="stroke:var(--muted)"/>
+        <text class="lbl" x="492" y="10" text-anchor="middle" transform="rotate(90 492 10)">L-V</text>
+        <g id="pl-dw" hidden><rect class="pan" x="401.25" y="-30" width="72.75" height="72"/><text class="lbl-in" x="437" y="10" text-anchor="middle">porte ouverte 24¼″</text></g>
+        <text class="lbl" x="492" y="120" text-anchor="middle" transform="rotate(90 492 120)">Évier · tiroirs</text>
         <rect class="room" x="0" y="0" width="474" height="399"/>
         <line x1="0" y1="399" x2="474" y2="399" stroke="var(--muted)" stroke-width="4"/>
         <text class="lbl" x="237" y="424" text-anchor="middle">Mur</text>
@@ -279,7 +287,7 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
     }),
     tile: tex(256, 256, (g, w, h) => { g.fillStyle = '#d9d1c3'; g.fillRect(0, 0, w, h); g.fillStyle = '#bdb3a2'; g.fillRect(0, 0, w, 6); g.fillRect(0, 0, 6, h); })
   };
-  T.tile.wrapS = T.tile.wrapT = THREE.RepeatWrapping; T.tile.repeat.set(158 / 13, 133 / 13);
+  T.tile.wrapS = T.tile.wrapT = THREE.RepeatWrapping; T.tile.repeat.set(183 / 13, 158 / 13);
   T.end = tex(512, 512, (g, w) => {
     const maple = ['#e2c69a', '#d9b98a', '#e8cfa6'], walnut = ['#5a3a26', '#4d311f', '#664330'], n = 8, s = w / n;
     for (let i = 0; i < n; i++) for (let j = 0; j < n; j++){
@@ -325,24 +333,130 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
   }
 
   // ---------- floor & context (inches; X = length 0..158, Z = width 0..133) ----------
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(158, 133), mat.floor);
-  floor.rotation.x = -Math.PI / 2; floor.position.set(79, 0, 66.5); floor.receiveShadow = true; world.add(floor);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(183, 158), mat.floor);
+  floor.rotation.x = -Math.PI / 2; floor.position.set(66.5, 0, 54); floor.receiveShadow = true; world.add(floor);
   const woodF = new THREE.Mesh(new THREE.PlaneGeometry(70, 133), mat.wood);
   woodF.rotation.x = -Math.PI / 2; woodF.position.set(193, 0, 66.5); woodF.receiveShadow = true; world.add(woodF);
   const under = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), mat.floor); // floor under existing counters
   under.rotation.x = -Math.PI/2; under.position.set(79, -0.05, -15); world.add(under);
 
   const ctx = new THREE.Group(); world.add(ctx);
-  // stove-side run (Z -25..0)
-  ctx.add(B(25, 68, 0, 34.5, -25, 0, mat.cab), B(98, 128, 0, 34.5, -25, 0, mat.cab));
-  ctx.add(B(24, 68, 34.5, 36, -26, 0.5, mat.ctop), B(98, 128.5, 34.5, 36, -26, 0.5, mat.ctop));
-  ctx.add(B(68, 98, 0, 36, -26, 0, mat.stove), B(68.5, 97.5, 6, 30, 0, 0.6, mat.steel), B(68, 98, 36, 42, -27, -24, mat.stove));
-  ctx.add(B(128.5, 158, 0, 68, -30, 0, mat.fridge));
-  // sink run (X -25..0)
-  ctx.add(B(-25, 0, 0, 34.5, -25, 80, mat.cab), B(-26, 0.5, 34.5, 36, -26, 80, mat.ctop));
-  // translucent walls
-  ctx.add(B(0, 158, 0, 84, 133, 135, mat.wall, false));
+  // ===== existing kitchen, from the photos of 18 Oct (model coords, inches) =====
+  // stove wall: wall plane Z = -25, cabinet fronts at Z = 0 facing +Z
+  // sink wall:  wall plane X = -25, cabinet fronts at X = 0 facing +X
+  // counters 35½" (1" laminate on 34½" boxes), backsplash 18", uppers to 88", ceiling 98½"
+  const kc = {
+    cab: M({ map: grain('#9a6a3f', '#7a4f2d', '#b7854f', 70, 0.45), roughness:0.55 }),
+    panel: M({ map: grain('#a3713f', '#83552f', '#bf8c55', 60, 0.4), roughness:0.5 }),
+    body: M({ color:0x6e4a2c, roughness:0.7 }),
+    kick: M({ color:0x3a2a1e, roughness:0.8 }),
+    lam: M({ color:0xe6ddca, roughness:0.45 }),
+    bronze: M({ color:0x6b5640, roughness:0.4, metalness:0.6 }),
+    frost: new THREE.MeshStandardMaterial({ color:0xe2e5e0, roughness:0.35, transparent:true, opacity:0.78 }),
+    sky: M({ color:0xd6e8f1, emissive:0xa8cde0, emissiveIntensity:0.55, roughness:0.1 }),
+    pine: M({ color:0xc69a62, roughness:0.6 }),
+    wall: new THREE.MeshStandardMaterial({ color:0xece6da, roughness:0.9 }),
+    ss: M({ color:0xbfc3c7, roughness:0.28, metalness:0.75 }),
+    black: M({ color:0x141414, roughness:0.25 }),
+    fridge: M({ color:0xf1f1ee, roughness:0.45 }),
+    tub: M({ color:0x9aa0a6, roughness:0.35, metalness:0.6 }),
+    rack: new THREE.MeshBasicMaterial({ color:0x8b9196, wireframe:true })
+  };
+  const mosaicT = tex(256, 256, (g, w) => {
+    const cols = ['#6b5a45', '#8a7a63', '#4f5a48', '#a39780', '#5e4a3a', '#7b7f6e', '#968a72'], n = 16, c = w / n;
+    g.fillStyle = '#cfc6b4'; g.fillRect(0, 0, w, w);
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++){ g.fillStyle = cols[Math.floor(rnd() * cols.length)]; g.fillRect(i * c + 1, j * c + 1, c - 2, c - 2); }
+  });
+  function mosaic(wid, hgt){ const t = mosaicT.clone(); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(wid / 16, hgt / 16); t.needsUpdate = true; return M({ map:t, roughness:0.35 }); }
+  // P: box in "run" coordinates. axis 'z' = stove wall (u along X, d along Z); axis 'x' = sink wall (u along Z, d along X)
+  const P = (axis, u0, u1, v0, v1, d0, d1, m) => axis === 'z' ? B(u0, u1, v0, v1, d0, d1, m) : B(d0, d1, v0, v1, u0, u1, m);
+  function front(axis, a0, a1, y0, y1, kind, kpos, doff){
+    doff = doff || 0; const g = ctx, f = doff;
+    if (kind === 'glass'){
+      g.add(P(axis, a0, a1, y0, y0 + 2.25, f, f + 0.75, kc.cab), P(axis, a0, a1, y1 - 2.25, y1, f, f + 0.75, kc.cab));
+      g.add(P(axis, a0, a0 + 2.25, y0 + 2.25, y1 - 2.25, f, f + 0.75, kc.cab), P(axis, a1 - 2.25, a1, y0 + 2.25, y1 - 2.25, f, f + 0.75, kc.cab));
+      g.add(P(axis, a0 + 2.25, a1 - 2.25, y0 + 2.25, y1 - 2.25, f + 0.3, f + 0.45, kc.frost));
+    } else {
+      g.add(P(axis, a0, a1, y0, y1, f, f + 0.75, kc.cab));
+      const ins = Math.min(2.25, (a1 - a0) / 5, (y1 - y0) / 4);
+      g.add(P(axis, a0 + ins, a1 - ins, y0 + ins, y1 - ins, f + 0.75, f + 1.0, kc.panel));
+    }
+    if (kind === 'drawer'){ const c = (a0 + a1) / 2, yc = (y0 + y1) / 2; g.add(P(axis, c - 2.75, c + 2.75, yc - 0.25, yc + 0.25, f + 1.0, f + 1.6, kc.bronze)); }
+    else if (kpos){
+      const u = kpos[1] === 'l' ? a0 + 1.6 : a1 - 1.6, y = kpos[0] === 't' ? y1 - 3 : y0 + 3;
+      g.add(P(axis, u - 0.45, u + 0.45, y - 0.45, y + 0.45, f + 1.0, f + 1.7, kc.bronze));
+    }
+  }
+  function base(axis, a0, a1){
+    ctx.add(P(axis, a0, a1, 4, 34.5, -24, 0, kc.body), P(axis, a0, a1, 0, 4, -24, -3, kc.kick));
+  }
+  function upperBox(axis, a0, a1, y0, y1){ ctx.add(P(axis, a0, a1, y0, y1, -25, -12.75, kc.body)); }
+  function windowOn(axis, a0, a1, y0, y1){ // on the wall plane (d = -25)
+    ctx.add(P(axis, a0 - 1.5, a1 + 1.5, y0 - 2, y0, -25, -23, kc.pine), P(axis, a0 - 1.5, a1 + 1.5, y1, y1 + 2, -25, -24, kc.pine));
+    ctx.add(P(axis, a0 - 1.5, a0, y0, y1, -25, -24, kc.pine), P(axis, a1, a1 + 1.5, y0, y1, -25, -24, kc.pine));
+    ctx.add(P(axis, a0, a1, y0, y1, -25, -24.8, kc.sky), P(axis, (a0 + a1) / 2 - 0.5, (a0 + a1) / 2 + 0.5, y0, y1, -24.8, -24.4, kc.pine));
+  }
+  // walls (single-sided, facing the room, so the camera can look through them from outside)
+  const wz = new THREE.Mesh(new THREE.PlaneGeometry(265, 98.5), kc.wall); wz.position.set(107.5, 49.25, -25); wz.receiveShadow = true; ctx.add(wz);
+  const wx = new THREE.Mesh(new THREE.PlaneGeometry(158, 98.5), kc.wall); wx.rotation.y = Math.PI / 2; wx.position.set(-25, 49.25, 54); wx.receiveShadow = true; ctx.add(wx);
 
+  // ---- stove wall, from the fridge (frigo end) toward the sink ----
+  // fridge tower 124..158: walnut sides, panel fridge, open cubby on top, crown
+  ctx.add(P('z', 124, 125.5, 0, 92, -25, 0.75, kc.cab), P('z', 156.5, 158, 0, 92, -25, 0.75, kc.cab));
+  ctx.add(P('z', 125.5, 156.5, 82, 92, -25, -24, kc.body), P('z', 125.5, 156.5, 82, 82.75, -24, 0.75, kc.cab), P('z', 125.5, 156.5, 91.25, 92, -24, 0.75, kc.cab));
+  ctx.add(P('z', 125.75, 156.25, 34, 81.5, -1, 0.5, kc.fridge), P('z', 125.75, 156.25, 5, 33.5, -1, 0.5, kc.fridge));
+  ctx.add(P('z', 126, 156, 0.5, 4.5, -1, 0, kc.black), P('z', 152.5, 154, 40, 76, 0.5, 1.4, kc.pine));
+  ctx.add(P('z', 123.25, 158.75, 92, 95.5, -25, 1.75, kc.cab));
+  // 36" drawer bank 88..124 (2 small + 2 large)
+  base('z', 88, 124);
+  front('z', 88.06, 105.94, 28.1, 34.2, 'drawer'); front('z', 106.06, 123.94, 28.1, 34.2, 'drawer');
+  front('z', 88.06, 123.94, 16.25, 27.95, 'drawer'); front('z', 88.06, 123.94, 4.25, 16.1, 'drawer');
+  // 30" range 58..88
+  ctx.add(P('z', 58, 88, 0, 36, -25, 0, kc.black), P('z', 58, 88, 36, 36.25, -25, 0, kc.black));
+  ctx.add(P('z', 58.4, 87.6, 8.5, 31, 0, 0.8, kc.ss), P('z', 62, 84, 13, 26.5, 0.8, 0.86, kc.black));
+  ctx.add(P('z', 60, 86, 28.6, 29.6, 1.3, 2.3, kc.ss), P('z', 58.4, 87.6, 1, 8, 0, 0.8, kc.ss), P('z', 60, 86, 5.8, 6.6, 0.8, 1.6, kc.ss));
+  ctx.add(P('z', 58, 88, 36.25, 43, -25, -22.5, kc.ss), P('z', 64, 74, 38.5, 40.5, -22.5, -22.4, kc.black));
+  // 20½" base right of the range 37.5..58
+  base('z', 37.5, 58);
+  front('z', 37.56, 57.94, 28.1, 34.2, 'drawer'); front('z', 37.56, 57.94, 4.25, 27.95, 'door', 'tl');
+  ctx.add(P('z', 37.5, 124, 34.5, 35.5, -25, 1, kc.lam));
+  ctx.add(P('z', 37.5, 124, 35.5, 53.5, -24.95, -24.9, mosaic(86.5, 18)));
+  // uppers (underside 53½"), hood 27½" above the cooktop, crown
+  upperBox('z', 88, 124, 53.5, 88); front('z', 88.06, 105.94, 53.5, 88, 'glass', 'br', -12.75); front('z', 106.06, 123.94, 53.5, 88, 'glass', 'bl', -12.75);
+  upperBox('z', 37.5, 58, 53.5, 88); front('z', 37.56, 57.94, 53.5, 88, 'glass', 'br', -12.75);
+  ctx.add(P('z', 58, 88, 63.75, 66.5, -25, -5, kc.black));
+  upperBox('z', 58, 88, 70, 88); front('z', 58.06, 72.94, 70, 88, 'door', 'bl', -12.75); front('z', 73.06, 87.94, 70, 88, 'door', 'br', -12.75);
+  ctx.add(P('z', 37, 124, 88, 91.5, -25, -11.5, kc.cab));
+  // window right of the counter, patio door beyond the fridge
+  windowOn('z', 6, 31, 42, 84);
+  ctx.add(P('z', 160, 222, 80, 83, -25, -23.5, kc.pine), P('z', 160, 163, 0, 80, -25, -23.5, kc.pine), P('z', 219, 222, 0, 80, -25, -23.5, kc.pine), P('z', 189.5, 192.5, 0, 80, -25, -23.5, kc.pine));
+  ctx.add(P('z', 163, 189.5, 1, 80, -25, -24.8, kc.sky), P('z', 192.5, 219, 1, 80, -25, -24.8, kc.sky));
+
+  // ---- sink wall, from the corner (Z = -25) ----
+  base('x', -25, -10); front('x', -24.2, -10.06, 4.25, 34.2, 'door', 'tr');
+  // dishwasher -10..14 (closed / open)
+  const dwC = new THREE.Group(), dwO = new THREE.Group(); ctx.add(dwC, dwO); dwO.visible = false;
+  dwC.add(B(0, 0.9, 4, 34.2, -9.94, 13.94, kc.ss), B(0.9, 1.6, 31, 32, -6, 10, kc.ss), B(0, 0.4, 0, 4, -9.94, 13.94, kc.kick));
+  dwO.add(B(-23, -22.5, 4.5, 34, -9.5, 13.5, kc.tub), B(-23, -0.6, 4.5, 34, -9.5, -9, kc.tub), B(-23, -0.6, 4.5, 34, 13, 13.5, kc.tub));
+  dwO.add(B(-23, -0.6, 33.5, 34, -9.5, 13.5, kc.tub), B(-23, -0.6, 4.5, 5, -9.5, 13.5, kc.tub), B(0, 0.4, 0, 4, -9.94, 13.94, kc.kick));
+  dwO.add(B(-1, 24.25, 6.5, 7.4, -9.94, 13.94, kc.ss));
+  dwO.add(B(1, 22, 7.6, 16, -8.5, 12.5, kc.rack), B(-9, 13, 17, 25, -8.5, 12.5, kc.rack), B(-6, 15, 27, 29, -8.5, 12.5, kc.rack));
+  // 30" sink base 14..44, 24" drawer bank 44..68
+  base('x', 14, 44); front('x', 14.06, 43.94, 28.1, 34.2, 'drawer');
+  front('x', 14.06, 28.94, 4.25, 27.95, 'door', 'tr'); front('x', 29.06, 43.94, 4.25, 27.95, 'door', 'tl');
+  base('x', 44, 68); front('x', 44.06, 67.94, 24.1, 34.2, 'drawer'); front('x', 44.06, 67.94, 14.1, 23.95, 'drawer'); front('x', 44.06, 67.94, 4.25, 13.95, 'drawer');
+  ctx.add(P('x', -25, 69, 34.5, 35.5, -25, 1, kc.lam));
+  ctx.add(P('x', 18, 40, 35.5, 35.56, -21, -4, kc.ss), P('x', 19, 39, 35.56, 35.6, -20, -5, kc.tub));
+  const tap = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 12, 16), kc.ss); tap.position.set(-22.5, 41.5, 29); ctx.add(tap);
+  ctx.add(B(-23, -15, 47, 48, 28.5, 29.5, kc.ss));
+  // backsplash, window over the sink, microwave cabinet in the corner
+  ctx.add(P('x', -25, 15, 35.5, 53.5, -24.95, -24.9, mosaic(40, 18)), P('x', 43, 69, 35.5, 53.5, -24.95, -24.9, mosaic(26, 18)), P('x', 15, 43, 35.5, 42.5, -24.95, -24.9, mosaic(28, 7)));
+  windowOn('x', 16.5, 41.5, 44.5, 82);
+  upperBox('x', -25, -10, 53.5, 88); ctx.add(P('x', -24.5, -10.5, 55, 68, -12.75, -12.2, kc.black), P('x', -13.5, -11, 56, 67, -12.2, -12.1, kc.ss));
+  front('x', -24.2, -10.06, 69, 88, 'door', 'bl', -12.75);
+  ctx.add(P('x', -25, -9.5, 88, 91.5, -25, -11.5, kc.cab));
+  // the console wall (opposite the stove), see-through so the island stays visible
+  ctx.add(B(0, 158, 0, 84, 133, 135, mat.wall, false));
   // ---------- island ----------
   const island = new THREE.Group(); world.add(island);
   // counter: X 42..117.5, Z 44.5..85.75
@@ -547,8 +661,8 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
 
   // ---------- views ----------
   const target = new THREE.Vector3(78.25, 17, 65);
-  const VIEWS = { cuisine:[8, 78, -38], tabourets:[136, 72, 178], dessus:[78.25, 245, 66.5],
-    prise1:[140, 32, 40, 115, 32, 49], prise2:[26, 22, 34, 54.5, 33.8, 58] };
+  const VIEWS = { cuisine:[8, 66, 6, 83, 22, 62], tabourets:[136, 72, 178], dessus:[78.25, 245, 66.5],
+    prise1:[140, 32, 40, 115, 32, 49], lv:[66, 60, 40, 150, 18, 4], prise2:[26, 22, 34, 54.5, 33.8, 58] };
   function setView(v){ const p = VIEWS[v]; camera.position.set(p[0], p[1], p[2]);
     if (p.length > 3) controls.target.set(p[3], p[4], p[5]); else controls.target.copy(target); controls.update(); }
   setView('cuisine');
@@ -565,6 +679,7 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
   radio('view', setView);
   radio('ut', v => { ut.position.z = v === '1' ? -16 : 0; });
   radio('pan', setPan);
+  radio('dw', v => { dwO.visible = v === '1'; dwC.visible = v !== '1'; document.getElementById('pl-dw').hidden = v !== '1'; });
   radio('acc', v => { const b = v === 'brule'; mat.walnut.map = b ? T.char : T.walnut; mat.walnut.roughness = b ? 0.92 : 0.6; mat.walnut.needsUpdate = true; });
   radio('round', v => { S.round = v === '1'; rebuildCounter(); document.getElementById('plan-top').setAttribute('rx', S.round ? 6 : 0); });
   radio('char', v => { S.char = v === '1'; slats.forEach(m => m.material = (S.char ? charMats : natMats)[m.userData.k]); });
