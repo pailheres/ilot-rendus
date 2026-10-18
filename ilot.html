@@ -87,12 +87,17 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
       <button class="chip" id="v-tabourets" data-v="tabourets" aria-pressed="false">Côté tabourets</button>
       <button class="chip" id="v-dessus" data-v="dessus" aria-pressed="false">Dessus</button>
       <button class="chip" id="v-lv" data-v="lv" aria-pressed="false">Lave-vaisselle</button>
+      <button class="chip" id="v-frigo" data-v="frigo" aria-pressed="false">Frigo</button>
       <button class="chip" id="v-prise1" data-v="prise1" aria-pressed="false">Prise tablettes</button>
       <button class="chip" id="v-prise2" data-v="prise2" aria-pressed="false">Prise bout frigo</button>
     </div></div>
     <div class="group"><span>Lave-vaisselle</span><div class="chips" data-group="dw">
       <button class="chip" id="d-ferme" data-v="0" aria-pressed="true">Fermé</button>
       <button class="chip" id="d-ouvert" data-v="1" aria-pressed="false">Ouvert</button>
+    </div></div>
+    <div class="group"><span>Frigo</span><div class="chips" data-group="fr">
+      <button class="chip" id="f-ferme" data-v="0" aria-pressed="true">Fermé</button>
+      <button class="chip" id="f-ouvert" data-v="1" aria-pressed="false">Ouvert</button>
     </div></div>
     <div class="group"><span>Tiroir à ustensiles</span><div class="chips" data-group="ut">
       <button class="chip" id="u-ferme" data-v="0" aria-pressed="true">Fermé</button>
@@ -132,6 +137,7 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
         <text class="lbl" x="156" y="-14" text-anchor="middle">Tiroirs 36″</text>
         <rect class="exist" x="0" y="-48" width="102" height="48"/>
         <text class="lbl" x="51" y="-20" text-anchor="middle">Frigo</text>
+        <g id="pl-fr" hidden><path class="ext" d="M 91.5 0 A 94 94 0 0 1 2 96"/><line class="dim" x1="2" y1="0" x2="2" y2="96" style="stroke-dasharray:4 3"/><text class="lbl-in" x="10" y="60">porte 32″</text></g>
         <rect class="exist" x="474" y="-36" width="36" height="303"/>
         <rect class="exist" x="474" y="276" width="10" height="108" style="fill:var(--surface)"/>
         <text class="lbl" x="497" y="330" text-anchor="middle" transform="rotate(90 497 330)">Porte</text>
@@ -406,8 +412,19 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
   // fridge tower 124..158: walnut sides, panel fridge, open cubby on top, crown
   ctx.add(P('z', 124, 125.5, 0, 95, -25, 0.75, kc.cab), P('z', 156.5, 158, 0, 95, -25, 0.75, kc.cab));
   ctx.add(P('z', 125.5, 156.5, 82, 95, -25, -24, kc.body), P('z', 125.5, 156.5, 82, 82.75, -24, 0.75, kc.cab), P('z', 125.5, 156.5, 94.25, 95, -24, 0.75, kc.cab));
-  ctx.add(P('z', 125.75, 156.25, 34, 81.5, -1, 0.5, kc.fridge), P('z', 125.75, 156.25, 5, 33.5, -1, 0.5, kc.fridge));
-  ctx.add(P('z', 126, 156, 0.5, 4.5, -1, 0, kc.black), P('z', 152.5, 154, 40, 76, 0.5, 1.4, kc.pine));
+  // freezer drawer + grille (always closed)
+  ctx.add(P('z', 125.75, 156.25, 5, 33.5, -1, 0.5, kc.fridge), P('z', 126, 156, 0.5, 4.5, -1, 0, kc.black));
+  // fresh-food door: hinge on the patio-door side (X = 158), handle on the drawer side
+  const frC = new THREE.Group(), frO = new THREE.Group(); ctx.add(frC, frO); frO.visible = false;
+  frC.add(P('z', 125.75, 156.25, 34, 81.5, -1, 0.5, kc.fridge), P('z', 127, 128.5, 40, 76, 0.5, 1.4, kc.pine));
+  // open at 90°: the special hinges push the door out, its free edge 32" in front of the fridge
+  const lit = M({ color:0xf7f8f6, emissive:0xdfe8ee, emissiveIntensity:0.35, roughness:0.5 });
+  const shelfG = new THREE.MeshStandardMaterial({ color:0xdfeef2, roughness:0.2, transparent:true, opacity:0.55 });
+  frO.add(P('z', 126, 156, 34, 81.5, -24, -23.5, lit), P('z', 126, 126.5, 34, 81.5, -23.5, -1, lit), P('z', 155.5, 156, 34, 81.5, -23.5, -1, lit), P('z', 126, 156, 81, 81.5, -23.5, -1, lit), P('z', 126, 156, 34, 34.5, -23.5, -1, lit));
+  [44, 54, 64, 73].forEach(y => frO.add(P('z', 126.5, 155.5, y, y + 0.3, -23.5, -2, shelfG)));
+  frO.add(P('z', 128, 154, 35, 43, -21, -3, shelfG));
+  frO.add(P('z', 157, 158.5, 34, 81.5, 1.5, 32, kc.fridge), P('z', 158.5, 159.4, 40, 76, 28, 29.5, kc.pine));
+  [38, 50, 62, 74].forEach(y => frO.add(P('z', 153.5, 157, y, y + 3.5, 4, 30, shelfG)));
   ctx.add(P('z', 123.25, 158.75, 95, 98.5, -25, 1.75, kc.cab));
   // 36" drawer bank 88..124 (2 small + 2 large)
   base('z', 88, 124);
@@ -672,7 +689,7 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
   // ---------- views ----------
   const target = new THREE.Vector3(78.25, 17, 65);
   const VIEWS = { cuisine:[8, 66, 6, 83, 22, 62], tabourets:[136, 72, 178], dessus:[78.25, 245, 66.5],
-    prise1:[140, 32, 40, 115, 32, 49], lv:[66, 60, 48, 150, 18, 12], prise2:[26, 22, 34, 54.5, 33.8, 58] };
+    prise1:[140, 32, 40, 115, 32, 49], lv:[66, 60, 48, 150, 18, 12], frigo:[60, 62, 80, 14, 50, 0], prise2:[26, 22, 34, 54.5, 33.8, 58] };
   function setView(v){ const p = VIEWS[v]; camera.position.set(p[0], p[1], p[2]);
     if (p.length > 3) controls.target.set(p[3], p[4], p[5]); else controls.target.copy(target); controls.update(); }
   setView('cuisine');
@@ -689,6 +706,7 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
   radio('view', setView);
   radio('ut', v => { ut.position.z = v === '1' ? -16 : 0; });
   radio('pan', setPan);
+  radio('fr', v => { frO.visible = v === '1'; frC.visible = v !== '1'; document.getElementById('pl-fr').hidden = v !== '1'; });
   radio('dw', v => { dwO.visible = v === '1'; dwC.visible = v !== '1'; document.getElementById('pl-dw').hidden = v !== '1'; });
   radio('acc', v => { const b = v === 'brule'; mat.walnut.map = b ? T.char : T.walnut; mat.walnut.roughness = b ? 0.92 : 0.6; mat.walnut.needsUpdate = true; });
   radio('round', v => { S.round = v === '1'; rebuildCounter(); document.getElementById('plan-top').setAttribute('rx', S.round ? 6 : 0); });
