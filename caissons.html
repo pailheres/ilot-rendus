@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<style>[hidden]{display:none!important}body{margin:0}</style>
+<title>Caissons en merisier russe</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: same atelier sheet as the island render — exploded viewer first, numbered cut list below */
+:root{
+  --bg:#f2f1ee; --surface:#ffffff; --fg:#1f1d1a; --muted:#69645c; --line:#d8d4cc;
+  --dim:#a87a00; --chip:#ebe8e2; --chip-on:#1f1d1a; --chip-on-fg:#f6f4f0; --scene:#e7e4de;
+  --tag-bg:#1f1d1a; --tag-fg:#f6f4f0; --row-hi:#f6edd6;
+  --f-display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161514; --surface:#201e1c; --fg:#ece8e1; --muted:#a29c92; --line:#393531;
+  --dim:#f0c419; --chip:#2b2825; --chip-on:#ece8e1; --chip-on-fg:#161514; --scene:#1e1d1b;
+  --tag-bg:#f0c419; --tag-fg:#161514; --row-hi:#2f2a1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161514; --surface:#201e1c; --fg:#ece8e1; --muted:#a29c92; --line:#393531;
+  --dim:#f0c419; --chip:#2b2825; --chip-on:#ece8e1; --chip-on-fg:#161514; --scene:#1e1d1b;
+  --tag-bg:#f0c419; --tag-fg:#161514; --row-hi:#2f2a1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(30px,5vw,44px);line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0;font-size:14px}
+.key{font-family:var(--f-mono);font-size:13px;display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--muted)}
+.key b{color:var(--fg);font-weight:500}
+.viewer{position:relative;border-radius:10px;overflow:hidden;background:var(--scene);border:1px solid var(--line);aspect-ratio:16/9;min-height:340px;max-width:100%}
+.viewer canvas{display:block;width:100%;height:100%;touch-action:none}
+.tags{position:absolute;inset:0;pointer-events:none}
+.tag{position:absolute;transform:translate(-50%,-50%);min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--tag-bg);color:var(--tag-fg);font:600 12px/22px var(--f-mono);text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.tag.hi{outline:2px solid var(--dim);outline-offset:1px}
+.hint{position:absolute;left:12px;bottom:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted);pointer-events:none}
+.controls{display:flex;flex-wrap:wrap;gap:14px 26px;align-items:flex-end}
+.group{display:grid;gap:6px;min-width:0}
+.group > span, .group > label{font-family:var(--f-display);font-weight:500;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+button.chip{font:500 13px var(--f-body);border:1px solid var(--line);background:var(--chip);color:var(--fg);padding:6px 12px;border-radius:999px;cursor:pointer}
+button.chip[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-fg);border-color:var(--chip-on)}
+button.chip:focus-visible, input:focus-visible{outline:2px solid var(--dim);outline-offset:2px}
+input[type=range]{width:220px;max-width:100%;accent-color:var(--dim)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;min-width:0}
+h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0 0 10px;letter-spacing:.01em}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:14px}
+th{text-align:left;font-family:var(--f-display);font-weight:500;text-transform:uppercase;letter-spacing:.06em;font-size:13px;color:var(--muted);padding:6px 10px;border-bottom:1px solid var(--line)}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n{width:34px}
+td.n span{display:inline-block;min-width:22px;height:22px;border-radius:11px;background:var(--tag-bg);color:var(--tag-fg);font:600 12px/22px var(--f-mono);text-align:center}
+td.d, td.q{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.hi td{background:var(--row-hi)}
+tbody tr{cursor:default}
+.note{color:var(--muted);font-size:13px;margin:12px 0 0}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Caissons en merisier russe</h1>
+      <p class="sub">2 caissons identiques + base commune · merisier russe 23/32″ · vue éclatée</p>
+    </div>
+    <div class="key"><span>Caisson <b>24⅛″ × 23¼″ × 30½″</b></span><span>Base <b>48¼″ × 23¼″ × 4″</b></span><span>Barres <b>3 × ½″ × 3″ × 24″</b></span></div>
+  </header>
+
+  <div class="viewer" id="viewer"><div class="tags" id="tags"></div><span class="hint">Glisser pour tourner · pincer ou molette pour zoomer · survoler une ligne du tableau pour repérer la pièce</span></div>
+
+  <div class="controls">
+    <div class="group"><label for="ex">Éclatement</label><input id="ex" type="range" min="0" max="100" value="70"></div>
+    <div class="group"><span>Position</span><div class="chips">
+      <button class="chip" id="b-asm" aria-pressed="false">Assemblé</button>
+      <button class="chip" id="b-exp" aria-pressed="true">Éclaté</button>
+    </div></div>
+    <div class="group"><span>Afficher</span><div class="chips" data-group="count">
+      <button class="chip" id="c-1" data-v="1" aria-pressed="false">1 caisson</button>
+      <button class="chip" id="c-2" data-v="2" aria-pressed="true">2 caissons</button>
+    </div></div>
+    <div class="group"><span>Barres d'acier</span><div class="chips">
+      <button class="chip" id="t-bars" aria-pressed="true">Visibles</button>
+    </div></div>
+    <div class="group"><span>Numéros</span><div class="chips">
+      <button class="chip" id="t-tags" aria-pressed="true">Visibles</button>
+    </div></div>
+  </div>
+
+  <section class="card">
+    <h2>Liste des pièces</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>#</th><th>Pièce</th><th>Qté (2 caissons)</th><th>Dimensions</th><th>Bois</th><th>Provient de</th></tr></thead>
+        <tbody id="rows">
+          <tr data-p="1"><td class="n"><span>1</span></td><td>Côté</td><td class="q">4</td><td class="d">23¼″ prof. × 30½″ haut</td><td>Merisier russe 23/32″</td><td>Morceaux 60 × 60 et 60 × 46½</td></tr>
+          <tr data-p="2"><td class="n"><span>2</span></td><td>Fond (entre les côtés, devant le dos)</td><td class="q">2</td><td class="d">22 11/16″ × 22 17/32″</td><td>Merisier russe 23/32″</td><td>Morceau 60 × 60</td></tr>
+          <tr data-p="3"><td class="n"><span>3</span></td><td>Dos (entre les côtés), extérieur peint noir</td><td class="q">2</td><td class="d">22 11/16″ × 30½″</td><td>Merisier russe 23/32″</td><td>Nouvelle feuille</td></tr>
+          <tr data-p="4"><td class="n"><span>4</span></td><td>Traverse du haut, avant</td><td class="q">2</td><td class="d">22 11/16″ × 4″</td><td>Merisier russe 23/32″</td><td>Morceau 60 × 60</td></tr>
+          <tr data-p="5"><td class="n"><span>5</span></td><td>Traverse du haut, arrière (contre le dos)</td><td class="q">2</td><td class="d">22 11/16″ × 4″</td><td>Merisier russe 23/32″</td><td>Morceau 60 × 46½</td></tr>
+          <tr data-p="6"><td class="n"><span>6</span></td><td>Base, avant et arrière (peintes noir)</td><td class="q">2</td><td class="d">48¼″ × 4″</td><td>Merisier russe 23/32″</td><td>Chute 60 × 7 + nouvelle feuille</td></tr>
+          <tr data-p="8"><td class="n"><span>8</span></td><td>Barre plate d'acier (support du débord), encastrée ½″ dans le dessus des côtés</td><td class="q">3</td><td class="d">½″ × 3″ × 24″</td><td>Acier 44W ou A-36, peint noir</td><td>Acier Lachine (coupé sur mesure)</td></tr>
+          <tr data-p="7"><td class="n"><span>7</span></td><td>Base, traverses (2 bouts + 1 milieu)</td><td class="q">3</td><td class="d">18 13/16″ × 4″</td><td>Merisier russe 23/32″</td><td>Chute 44½ × 11</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">La base est en retrait de 3″ à l'avant (coup de pied) et affleure à l'arrière et au bout côté frigo, pour que les lattes aient un fond jusqu'au plancher. Percer les trous des coulisses dans les côtés avant l'assemblage. Les tiroirs, les façades et la section des tablettes ne sont pas montrés ici.</p>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+  const host = document.getElementById('viewer'), tagsEl = document.getElementById('tags');
+  if (!window.THREE){ host.insertAdjacentHTML('beforeend', '<p style="padding:20px">Le rendu 3D n\'a pas pu se charger.</p>'); return; }
+
+  const renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  host.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  function sceneBg(){ scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--scene').trim() || '#e7e4de'); }
+  sceneBg();
+  try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sceneBg); } catch(e){}
+  new MutationObserver(sceneBg).observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
+
+  const camera = new THREE.PerspectiveCamera(36, 16/9, 1, 2000);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.08; controls.maxPolarAngle = Math.PI / 2 - 0.03;
+  controls.minDistance = 30; controls.maxDistance = 400;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7a66, 0.68));
+  const key = new THREE.DirectionalLight(0xfff4e6, 0.8); key.position.set(-60, 140, -90); key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left:-110, right:110, top:110, bottom:-110, near:10, far:500 });
+  key.shadow.bias = -0.0006; scene.add(key);
+  const fill = new THREE.DirectionalLight(0xe6eeff, 0.35); fill.position.set(90, 80, 120); scene.add(fill);
+
+  // ---------- Baltic birch materials: face grain + striped ply edges ----------
+  let seed = 5; const rnd = () => (seed = (seed * 16807) % 2147483647, (seed - 1) / 2147483646);
+  function tex(w, h, draw){ const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t; }
+  const faceT = tex(256, 256, (g, w, h) => {
+    g.fillStyle = '#ead9b8'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 40; i++){ g.globalAlpha = 0.12 + rnd() * 0.15; g.strokeStyle = rnd() > 0.5 ? '#d6bf95' : '#f3e6cc'; g.lineWidth = 1 + rnd() * 3;
+      let y = rnd() * h; g.beginPath(); g.moveTo(0, y); for (let x = 0; x <= w; x += 32){ y += (rnd() - 0.5) * 4; g.lineTo(x, y); } g.stroke(); }
+    g.globalAlpha = 1;
+  });
+  function plies(vertical){
+    return tex(vertical ? 64 : 4, vertical ? 4 : 64, (g, w, h) => {
+      const n = 13;
+      for (let i = 0; i < n; i++){
+        g.fillStyle = i % 2 ? '#c9a873' : '#efe0c2';
+        if (vertical) g.fillRect(i * w / n, 0, w / n + 1, h); else g.fillRect(0, i * h / n, w, h / n + 1);
+      }
+    });
+  }
+  const edgeU = plies(true), edgeV = plies(false);
+  const M = (o) => new THREE.MeshStandardMaterial(Object.assign({ roughness:0.72, metalness:0 }, o));
+
+  // box with ply edges oriented to the thin axis; per-mesh materials so a part can be highlighted
+  function part(x0, x1, y0, y1, z0, z1, num){
+    const dx = x1 - x0, dy = y1 - y0, dz = z1 - z0, thin = dx <= dy && dx <= dz ? 'x' : (dy <= dz ? 'y' : 'z');
+    const f = () => M({ map:faceT }), eu = () => M({ map:edgeU }), ev = () => M({ map:edgeV });
+    // face order: px, nx, py, ny, pz, nz
+    const mats = thin === 'x' ? [f(), f(), eu(), eu(), eu(), eu()]
+               : thin === 'y' ? [ev(), ev(), f(), f(), ev(), ev()]
+               :                [eu(), eu(), ev(), ev(), f(), f()];
+    const m = new THREE.Mesh(new THREE.BoxGeometry(dx, dy, dz), mats);
+    m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+    m.castShadow = m.receiveShadow = true; m.userData = { num, home: m.position.clone(), dir: new THREE.Vector3() };
+    return m;
+  }
+
+  // ---------- geometry (inches). X = width, Y = up, Z = depth (0 = front, 23¼ = back) ----------
+  const T = 23 / 32, W = 24.125, D = 23.25, H0 = 4, H1 = 34.5;
+  const parts = [];
+  const all = new THREE.Group(); scene.add(all);
+  const cab = [new THREE.Group(), new THREE.Group()]; all.add(cab[0], cab[1]);
+  const baseG = new THREE.Group(); all.add(baseG);
+
+  function add(group, m, dir, tagOffset){ m.userData.dir.copy(dir); m.userData.tagOff = tagOffset || new THREE.Vector3(); group.add(m); parts.push(m); return m; }
+  for (let k = 0; k < 2; k++){
+    const xo = k * W, g = cab[k], side = k === 0 ? -1 : 1;
+    add(g, part(xo, xo + T, H0, H1, 0, D, 1), new THREE.Vector3(-7, 0, 0), new THREE.Vector3(-1, 4, -4));
+    add(g, part(xo + W - T, xo + W, H0, H1, 0, D, 1), new THREE.Vector3(7, 0, 0), new THREE.Vector3(1, 4, -4));
+    add(g, part(xo + T, xo + W - T, H0, H0 + T, 0, D - T, 2), new THREE.Vector3(0, -3.5, -2), new THREE.Vector3(0, 1, -6));
+    add(g, part(xo + T, xo + W - T, H0, H1, D - T, D, 3), new THREE.Vector3(0, 0, 9), new THREE.Vector3(0, 4, 1));
+    add(g, part(xo + T, xo + W - T, H1 - T, H1, 0, 4, 4), new THREE.Vector3(0, 6, -5), new THREE.Vector3(0, 1, 0));
+    add(g, part(xo + T, xo + W - T, H1 - T, H1, D - T - 4, D - T, 5), new THREE.Vector3(0, 9, 3), new THREE.Vector3(0, 1, 0));
+    g.userData.dir = new THREE.Vector3(side * 9, 0, 0);
+  }
+  add(baseG, part(0, 2 * W, 0, H0, 3, 3 + T, 6), new THREE.Vector3(0, 0, -7), new THREE.Vector3(10, 0, -1));
+  add(baseG, part(0, 2 * W, 0, H0, D - T, D, 6), new THREE.Vector3(0, 0, 7), new THREE.Vector3(10, 0, 1));
+  [0, W - T / 2, 2 * W - T].forEach((x, i) => add(baseG, part(x, x + T, 0, H0, 3 + T, D - T, 7), new THREE.Vector3((i - 1) * 6, 0, 0), new THREE.Vector3(0, 1, 0)));
+  baseG.userData.dir = new THREE.Vector3(0, -10, 0);
+  // steel flat bars ½" x 3" x 24" (#8): notched ½" into the side tops, 8½" over the carcass, 15½" out the back (stool overhang)
+  const steelM = () => M({ color:0x1d1e20, roughness:0.45, metalness:0.7 });
+  function bar(cx){
+    const m = new THREE.Mesh(new THREE.BoxGeometry(3, 0.5, 24), [steelM(), steelM(), steelM(), steelM(), steelM(), steelM()]);
+    m.position.set(cx, H1 - 0.25, D - 8.5 + 12); m.castShadow = m.receiveShadow = true;
+    m.userData = { num:8, home:m.position.clone(), dir:new THREE.Vector3() }; return m;
+  }
+  const bars = [];
+  bars.push(add(cab[0], bar(T / 2), new THREE.Vector3(-7, 14, 0), new THREE.Vector3(0, 1, 8)));
+  bars.push(add(all, bar(W), new THREE.Vector3(0, 14, 0), new THREE.Vector3(0, 1, 8)));
+  bars.push(add(cab[1], bar(2 * W - T / 2), new THREE.Vector3(7, 14, 0), new THREE.Vector3(0, 1, 8)));
+
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), M({ color:0xd9d1c3, roughness:0.9 }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -12.01; floor.receiveShadow = true; scene.add(floor);
+  all.position.set(-W, 0, -D / 2);
+
+  // ---------- explode ----------
+  let t = 0.7, target = 0.7, count = 2;
+  function apply(){
+    parts.forEach(m => m.position.copy(m.userData.home).addScaledVector(m.userData.dir, t));
+    cab.forEach(g => g.position.copy(g.userData.dir).multiplyScalar(t));
+    baseG.position.copy(baseG.userData.dir).multiplyScalar(t);
+    floor.position.y = -0.01 - 12 * t;
+  }
+
+  // ---------- tags ----------
+  const tagEls = parts.map(m => { const d = document.createElement('div'); d.className = 'tag'; d.textContent = m.userData.num; tagsEl.appendChild(d); return d; });
+  let showTags = true, hiNum = 0;
+  const v = new THREE.Vector3(), box = new THREE.Box3();
+  function updateTags(){
+    const r = host.getBoundingClientRect();
+    parts.forEach((m, i) => {
+      const el = tagEls[i];
+      if (!showTags || !m.parent.visible || !m.visible){ el.hidden = true; return; }
+      box.setFromObject(m); box.getCenter(v); v.add(m.userData.tagOff);
+      v.project(camera);
+      if (v.z > 1){ el.hidden = true; return; }
+      el.hidden = false;
+      el.style.left = ((v.x + 1) / 2 * r.width) + 'px'; el.style.top = ((1 - v.y) / 2 * r.height) + 'px';
+      el.classList.toggle('hi', hiNum === m.userData.num);
+    });
+  }
+  function highlight(num){
+    hiNum = num;
+    parts.forEach(m => m.material.forEach(mt => mt.emissive.setHex(num && m.userData.num === num ? 0x7a5200 : 0x000000)));
+    document.querySelectorAll('#rows tr').forEach(tr => tr.classList.toggle('hi', +tr.dataset.p === num));
+  }
+  document.querySelectorAll('#rows tr').forEach(tr => {
+    tr.addEventListener('mouseenter', () => highlight(+tr.dataset.p));
+    tr.addEventListener('mouseleave', () => highlight(0));
+    tr.addEventListener('click', () => highlight(hiNum === +tr.dataset.p ? 0 : +tr.dataset.p));
+  });
+
+  // ---------- camera / loop ----------
+  camera.position.set(-75, 62, -92); controls.target.set(0, 14, 0); controls.update();
+  function resize(){ const r = host.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / Math.max(1, r.height); camera.updateProjectionMatrix(); }
+  new ResizeObserver(resize).observe(host); resize();
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  apply();
+  (function loop(){
+    if (Math.abs(target - t) > 0.001){ t = reduce ? target : t + (target - t) * 0.12; apply(); }
+    controls.update(); renderer.render(scene, camera); updateTags(); requestAnimationFrame(loop);
+  })();
+
+  // ---------- UI ----------
+  const ex = document.getElementById('ex'), bA = document.getElementById('b-asm'), bE = document.getElementById('b-exp');
+  function setTarget(val){ target = val; ex.value = Math.round(val * 100); bA.setAttribute('aria-pressed', String(val === 0)); bE.setAttribute('aria-pressed', String(val > 0)); }
+  ex.addEventListener('input', () => setTarget(ex.value / 100));
+  bA.addEventListener('click', () => setTarget(0));
+  bE.addEventListener('click', () => setTarget(0.7));
+  document.querySelectorAll('[data-group="count"] button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-group="count"] button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    count = +b.dataset.v; cab[1].visible = count === 2; baseG.visible = count === 2;
+  }));
+  const tb = document.getElementById('t-bars');
+  tb.addEventListener('click', () => { const on = tb.getAttribute('aria-pressed') !== 'true'; tb.setAttribute('aria-pressed', String(on)); tb.textContent = on ? 'Visibles' : 'Cachées'; bars.forEach(b => b.visible = on); });
+  const tt = document.getElementById('t-tags');
+  tt.addEventListener('click', () => { showTags = !showTags; tt.setAttribute('aria-pressed', String(showTags)); tt.textContent = showTags ? 'Visibles' : 'Cachés'; });
+})();
+</script>
+
+</html>

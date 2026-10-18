@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<style>[hidden]{display:none!important}body{margin:0}</style>
+<title>Îlot érable et noyer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: atelier sheet — 3D viewer first, then plan + specs side by side, stacked on phone */
+:root{
+  --bg:#f2f1ee; --surface:#ffffff; --fg:#1f1d1a; --muted:#69645c; --line:#d8d4cc;
+  --dim:#a87a00; --chip:#ebe8e2; --chip-on:#1f1d1a; --chip-on-fg:#f6f4f0;
+  --scene:#e7e4de; --plan-top:#e9d6b4; --plan-struct:#3a3633; --plan-exist:#d9d3c8; --plan-stool:#c9b28c; --plan-bil:#cfa56c;
+  --f-display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161514; --surface:#201e1c; --fg:#ece8e1; --muted:#a29c92; --line:#393531;
+  --dim:#f0c419; --chip:#2b2825; --chip-on:#ece8e1; --chip-on-fg:#161514;
+  --scene:#1e1d1b; --plan-top:#6b5638; --plan-struct:#d9d3c8; --plan-exist:#34302c; --plan-stool:#7d6a4c; --plan-bil:#94703f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161514; --surface:#201e1c; --fg:#ece8e1; --muted:#a29c92; --line:#393531;
+  --dim:#f0c419; --chip:#2b2825; --chip-on:#ece8e1; --chip-on-fg:#161514;
+  --scene:#1e1d1b; --plan-top:#6b5638; --plan-struct:#d9d3c8; --plan-exist:#34302c; --plan-stool:#7d6a4c; --plan-bil:#94703f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(30px,5vw,44px);line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0;font-size:14px}
+.key{font-family:var(--f-mono);font-size:13px;display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--muted)}
+.key b{color:var(--fg);font-weight:500}
+.viewer{position:relative;border-radius:10px;overflow:hidden;background:var(--scene);border:1px solid var(--line);aspect-ratio:16/9;min-height:340px;max-width:100%}
+.viewer canvas{display:block;width:100%;height:100%;touch-action:none}
+.hint{position:absolute;left:12px;bottom:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted);pointer-events:none}
+.controls{display:flex;flex-wrap:wrap;gap:14px 26px}
+.group{display:grid;gap:6px;min-width:0}
+.group > span{font-family:var(--f-display);font-weight:500;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+button.chip{font:500 13px var(--f-body);border:1px solid var(--line);background:var(--chip);color:var(--fg);padding:6px 12px;border-radius:999px;cursor:pointer}
+button.chip[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-fg);border-color:var(--chip-on)}
+button.chip:focus-visible{outline:2px solid var(--dim);outline-offset:2px}
+.below{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px}
+@media (max-width:820px){.below{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;min-width:0}
+h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0 0 10px;letter-spacing:.01em}
+.plan{overflow-x:auto}
+.plan svg{width:100%;height:auto;display:block;min-width:300px}
+.plan .room{fill:none;stroke:var(--muted);stroke-width:1.5}
+.plan .exist{fill:var(--plan-exist);stroke:var(--line)}
+.plan .top{fill:var(--plan-top);stroke:var(--plan-struct);stroke-width:1.2}
+.plan .struct{fill:none;stroke:var(--plan-struct);stroke-width:1.2;stroke-dasharray:5 4}
+.plan .pan{fill:none;stroke:var(--dim);stroke-width:1.4;stroke-dasharray:3 2}
+.plan .stool{fill:var(--plan-stool);stroke:var(--plan-struct);stroke-width:1}
+.plan .leg{fill:var(--plan-struct)}
+.plan .dim{stroke:var(--dim);stroke-width:1.6;fill:none}
+.plan .ext{stroke:var(--dim);stroke-width:1;stroke-dasharray:3 3;fill:none}
+.plan .dimt{fill:var(--dim);font:500 15px var(--f-mono)}
+.plan .lbl{fill:var(--muted);font:500 13px var(--f-body)}
+.plan .lbl-in{fill:var(--fg);font:500 12px var(--f-body)}
+.plan .wood{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:6 5}
+.plan marker path{stroke:var(--dim);stroke-width:1.6}
+.cap{color:var(--muted);font-size:13px;margin:10px 0 0}
+dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 16px;margin:0}
+dt{color:var(--muted);font-size:14px}
+dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabular-nums}
+.sw{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:7px;border:1px solid var(--line)}
+.mats{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:6px;font-size:14px}
+.note{color:var(--muted);font-size:13px;margin:14px 0 0}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Îlot érable et noyer</h1>
+      <p class="sub">Rendu indicatif · tout en tiroirs · lattes brûlées derrière et sur les côtés · 4 places assises</p>
+    </div>
+    <div class="key"><span>Comptoir <b>75½″ × 41¼″</b></span><span>Hauteur <b>36″</b></span><span>Tiroirs <b>2 × 24⅛″</b></span><span>Tablettes <b>10″</b> côté évier</span></div>
+  </header>
+
+  <div class="viewer" id="viewer"><span class="hint">Glisser pour tourner · pincer ou molette pour zoomer</span></div>
+
+  <div class="controls">
+    <div class="group"><span>Vue</span><div class="chips" data-group="view">
+      <button class="chip" id="v-cuisine" data-v="cuisine" aria-pressed="true">Côté cuisine</button>
+      <button class="chip" id="v-tabourets" data-v="tabourets" aria-pressed="false">Côté tabourets</button>
+      <button class="chip" id="v-dessus" data-v="dessus" aria-pressed="false">Dessus</button>
+      <button class="chip" id="v-prise1" data-v="prise1" aria-pressed="false">Prise tablettes</button>
+      <button class="chip" id="v-prise2" data-v="prise2" aria-pressed="false">Prise bout frigo</button>
+    </div></div>
+    <div class="group"><span>Tiroir à ustensiles</span><div class="chips" data-group="ut">
+      <button class="chip" id="u-ferme" data-v="0" aria-pressed="true">Fermé</button>
+      <button class="chip" id="u-ouvert" data-v="1" aria-pressed="false">Ouvert</button>
+    </div></div>
+    <div class="group"><span>Coins du comptoir</span><div class="chips" data-group="round">
+      <button class="chip" id="r-droit" data-v="0" aria-pressed="true">Droits</button>
+      <button class="chip" id="r-rond" data-v="1" aria-pressed="false">Arrondis</button>
+    </div></div>
+    <div class="group"><span>Bac encastré</span><div class="chips" data-group="pan">
+      <button class="chip" id="p-non" data-v="non" aria-pressed="true">Sans</button>
+      <button class="chip" id="p-couvert" data-v="couvert" aria-pressed="false">Couvercle en place</button>
+      <button class="chip" id="p-ouvert" data-v="ouvert" aria-pressed="false">Couvercle retiré</button>
+    </div></div>
+    <div class="group"><span>Lattes</span><div class="chips" data-group="char">
+      <button class="chip" id="c-brule" data-v="1" aria-pressed="true">Brûlées</button>
+      <button class="chip" id="c-nat" data-v="0" aria-pressed="false">Naturelles</button>
+    </div></div>
+    <div class="group"><span>Poteaux, pattes et poignées</span><div class="chips" data-group="acc">
+      <button class="chip" id="a-noyer" data-v="noyer" aria-pressed="true">Noyer</button>
+      <button class="chip" id="a-brule" data-v="brule" aria-pressed="false">Bois brûlé</button>
+    </div></div>
+    <div class="group"><span>Afficher</span><div class="chips">
+      <button class="chip" id="t-stools" aria-pressed="true">Tabourets</button>
+      <button class="chip" id="t-ctx" aria-pressed="true">Cuisine existante</button>
+    </div></div>
+  </div>
+
+  <div class="below">
+    <section class="card plan">
+      <h2>Vue en plan</h2>
+      <svg viewBox="-70 -62 620 520" role="img" aria-label="Plan de la cuisine avec l'îlot, les passages et les tabourets">
+        <defs><marker id="tk" viewBox="-5 -5 10 10" markerWidth="9" markerHeight="9" orient="auto"><path d="M0,-4 L0,4"/></marker></defs>
+        <rect class="exist" x="90" y="-36" width="309" height="36"/>
+        <rect class="exist" x="180" y="-36" width="90" height="36" style="stroke:var(--muted)"/>
+        <text class="lbl" x="225" y="-14" text-anchor="middle">Cuisinière</text>
+        <text class="lbl" x="334" y="-14" text-anchor="middle">Comptoir</text>
+        <rect class="exist" x="0" y="-48" width="90" height="48"/>
+        <text class="lbl" x="45" y="-20" text-anchor="middle">Frigo</text>
+        <rect class="exist" x="474" y="-36" width="36" height="276"/>
+        <text class="lbl" x="492" y="110" text-anchor="middle" transform="rotate(90 492 110)">Évier · lave-vaisselle</text>
+        <rect class="room" x="0" y="0" width="474" height="399"/>
+        <line x1="0" y1="399" x2="474" y2="399" stroke="var(--muted)" stroke-width="4"/>
+        <text class="lbl" x="237" y="424" text-anchor="middle">Mur</text>
+        <line class="wood" x1="0" y1="0" x2="0" y2="399"/>
+        <text class="lbl" x="-20" y="200" text-anchor="middle" transform="rotate(-90 -20 200)">Plancher de bois · salle à manger</text>
+
+        <rect class="top" id="plan-top" x="121.5" y="133.5" width="226.5" height="123.75"/>
+        <rect class="struct" x="166.5" y="136.5" width="178.5" height="75.75"/>
+        <line class="struct" x1="242.6" y1="136.5" x2="242.6" y2="208.5"/>
+        <text class="lbl-in" x="204.5" y="178" text-anchor="middle">24⅛″</text>
+        <text class="lbl-in" x="200" y="244" text-anchor="middle">débord 15″</text>
+        <g id="pl-tab">
+          <line class="struct" x1="315" y1="136.5" x2="315" y2="208.5"/>
+          <text class="lbl-in" x="279" y="178" text-anchor="middle">24⅛″</text>
+          <text class="lbl-in" x="330" y="150" text-anchor="middle">10″</text>
+          <text class="lbl-in" x="330" y="206" text-anchor="middle">tabl.</text>
+        </g>
+        <g id="pl-pan" hidden>
+          <rect class="pan" x="319.125" y="154.5" width="20.625" height="38.25"/>
+        </g>
+        <text class="lbl-in" x="144" y="180" text-anchor="middle">15″</text>
+        <rect class="leg" x="123" y="248.25" width="7.5" height="7.5"/>
+        <rect class="leg" x="123" y="135" width="7.5" height="7.5"/>
+        <circle class="stool" cx="343.5" cy="275" r="22.5"/>
+        <circle class="stool" cx="253.5" cy="275" r="22.5"/>
+        <circle class="stool" cx="163.5" cy="275" r="22.5"/>
+        <circle class="stool" cx="97" cy="195" r="22.5"/>
+
+        <line class="dim" x1="234" y1="0" x2="234" y2="133.5" marker-start="url(#tk)" marker-end="url(#tk)"/>
+        <text class="dimt" x="242" y="72">44½″</text>
+        <line class="dim" x1="288" y1="257.25" x2="288" y2="399" marker-start="url(#tk)" marker-end="url(#tk)"/>
+        <text class="dimt" x="296" y="335">47¼″</text>
+        <line class="dim" x1="348" y1="168" x2="474" y2="168" marker-start="url(#tk)" marker-end="url(#tk)"/>
+        <text class="dimt" x="411" y="160" text-anchor="middle">42″</text>
+        <line class="dim" x1="0" y1="145" x2="121.5" y2="145" marker-start="url(#tk)" marker-end="url(#tk)"/>
+        <text class="dimt" x="61" y="137" text-anchor="middle">40½″</text>
+      </svg>
+      <p class="cap">Espace libre 158″ × 133″. Le comptoir est en couleur, la structure (caissons et revêtement) en pointillé. Les petits carrés sont les pattes de noyer aux deux coins du bout côté frigo.</p>
+    </section>
+
+    <section class="card">
+      <h2>Dimensions</h2>
+      <dl>
+        <dt>Comptoir</dt><dd>75½″ × 41¼″ × 1½″</dd>
+        <dt>Hauteur finie</dt><dd>36″</dd>
+        <dt>Structure</dt><dd>59½″ × 25¼″ × 34½″</dd>
+        <dt>Caissons</dt><dd>2 × 24⅛″, 24″ prof.</dd>
+        <dt>Tiroirs</dt><dd>3 par caisson, façades ≈ 6″, 10″, 13″</dd>
+        <dt>Tiroir à ustensiles</dt><dd>haut du caisson côté frigo, séparateurs à 30°</dd>
+        <dt>Tablettes</dt><dd>bout côté évier, 10″ prof., 3 niveaux</dd>
+        <dt>Bac encastré (option)</dt><dd>bac inox ⅓ (6⅞″ × 12¾″ × 4″) au-dessus des tablettes, couvercle en bois de bout érable et noyer, 1½″</dd>
+        <dt>Support du débord</dt><dd>3 barres d'acier plates ½″ × 3″ × 24″ sur les côtés des caissons</dd>
+        <dt>Prises</dt><dd>1 double dans la traverse de noyer du bout côté évier, 1 bloc prises + USB sous le débord du bout côté frigo</dd>
+        <dt>Plinthe avant</dt><dd>4″ haut, 3″ retrait</dd>
+        <dt>Revêtement</dt><dd>ctrp. ½″ + lattes ¾″</dd>
+        <dt>Lattes</dt><dd>2″ × ¾″, espace ≈ ¼″</dd>
+        <dt>Tabourets</dt><dd>assise 24″, 30″ entre les centres, le 3ᵉ à 14″ du coin</dd>
+        <dt>Débords</dt><dd>15″ tabourets et bout frigo, 1″ ailleurs</dd>
+        <dt>Passages</dt><dd>44½″ cuisinière · 47¼″ tabourets · 42″ évier · 40½″ frigo</dd>
+      </dl>
+      <div class="mats">
+        <div><span class="sw" style="background:#2e2a27"></span>Lattes : érable ou hêtre brûlé (shou sugi ban)</div>
+        <div><span class="sw" style="background:#5b3c29"></span>Poteaux de coin et poignées : noyer</div>
+        <div><span class="sw" style="background:#e2c79c"></span>Comptoir bloc-boucher et façades : érable ou hêtre</div>
+        <div><span class="sw" style="background:#141312"></span>Fond derrière les lattes : contreplaqué peint noir</div>
+      </div>
+      <p class="note">La cuisine existante est approximative. Les équerres d'acier cachées sous le débord ne sont pas dessinées.</p>
+    </section>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+  const host = document.getElementById('viewer');
+  if (!window.THREE) { host.insertAdjacentHTML('beforeend','<p style="padding:20px">Le rendu 3D n\'a pas pu se charger.</p>'); return; }
+  const S = { mode:'mix', char:true, stools:true, ctx:true, round:false };
+
+  // ---------- renderer / scene ----------
+  const renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  host.prepend(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  // mirrored left-right: sink on the right, fridge on the left (x' = 158 - x)
+  const world = new THREE.Group(); world.scale.x = -1; world.position.x = 158; scene.add(world);
+  function sceneBg(){ const c = getComputedStyle(document.documentElement).getPropertyValue('--scene').trim() || '#e7e4de'; scene.background = new THREE.Color(c); }
+  sceneBg();
+  try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sceneBg); } catch(e){}
+  new MutationObserver(sceneBg).observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
+
+  const camera = new THREE.PerspectiveCamera(38, 16/9, 1, 3000);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.maxPolarAngle = Math.PI/2 - 0.04; controls.minDistance = 40; controls.maxDistance = 520;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7a66, 0.62));
+  const key = new THREE.DirectionalLight(0xfff4e6, 0.85);
+  key.position.set(8, 220, -60); key.target.position.set(78, 0, 65);
+  key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+  Object.assign(key.shadow.camera, { left:-170, right:170, top:170, bottom:-170, near:10, far:600 });
+  key.shadow.bias = -0.0005;
+  scene.add(key, key.target);
+  const fill = new THREE.DirectionalLight(0xe6eeff, 0.35); fill.position.set(138, 140, 260); scene.add(fill);
+
+  // ---------- textures ----------
+  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647, (seed - 1) / 2147483646);
+  function tex(w, h, draw){ const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t; }
+  function grain(base, dark, light, n, alpha){
+    return tex(128, 512, (g, w, h) => {
+      g.fillStyle = base; g.fillRect(0, 0, w, h);
+      for (let i = 0; i < n; i++){
+        g.globalAlpha = alpha * (0.4 + rnd() * 0.6);
+        g.strokeStyle = rnd() > 0.5 ? dark : light; g.lineWidth = 0.6 + rnd() * 2.2;
+        let x = rnd() * w; g.beginPath(); g.moveTo(x, 0);
+        for (let y = 0; y <= h; y += 32){ x += (rnd() - 0.5) * 3; g.lineTo(x, y); }
+        g.stroke();
+      }
+      g.globalAlpha = 1;
+    });
+  }
+  const T = {
+    char: grain('#2c2926', '#121110', '#5a534c', 70, 0.55),
+    nat: grain('#e3c9a1', '#c9a77a', '#f0dfc2', 60, 0.5),
+    walnut: grain('#5a3b28', '#3b2619', '#74513a', 60, 0.6),
+    front: grain('#e6cda6', '#cfae82', '#f2e2c7', 50, 0.45),
+    block: tex(64, 1024, (g, w, h) => {
+      const n = 55, bh = h / n, tones = ['#e6cfa8','#dcc196','#e9d5b2','#d6b98c','#e1c79f','#cfae80','#ead9b8'];
+      for (let i = 0; i < n; i++){
+        g.fillStyle = tones[Math.floor(rnd() * tones.length)]; g.fillRect(0, i * bh, w, bh);
+        g.globalAlpha = 0.35; g.strokeStyle = '#b9966a';
+        for (let k = 0; k < 4; k++){ const y = i * bh + rnd() * bh; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y + (rnd() - 0.5) * 2); g.stroke(); }
+        g.globalAlpha = 0.5; g.fillStyle = '#a88760'; g.fillRect(0, i * bh, w, 0.8); g.globalAlpha = 1;
+      }
+    }),
+    tile: tex(256, 256, (g, w, h) => { g.fillStyle = '#d9d1c3'; g.fillRect(0, 0, w, h); g.fillStyle = '#bdb3a2'; g.fillRect(0, 0, w, 6); g.fillRect(0, 0, 6, h); })
+  };
+  T.tile.wrapS = T.tile.wrapT = THREE.RepeatWrapping; T.tile.repeat.set(158 / 13, 133 / 13);
+  T.end = tex(512, 512, (g, w) => {
+    const maple = ['#e2c69a', '#d9b98a', '#e8cfa6'], walnut = ['#5a3a26', '#4d311f', '#664330'], n = 8, s = w / n;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++){
+      g.save(); g.beginPath(); g.rect(i * s, j * s, s, s); g.clip();
+      const tones = (i + j) % 2 ? walnut : maple; g.fillStyle = tones[Math.floor(rnd() * tones.length)]; g.fillRect(i * s, j * s, s, s);
+      const cx = i * s + (rnd() < 0.5 ? -1 : 2) * s * rnd(), cy = j * s + (rnd() < 0.5 ? -1 : 2) * s * rnd();
+      g.strokeStyle = 'rgba(120,85,45,0.35)'; g.lineWidth = 1.2;
+      for (let r = 6; r < s * 3; r += 5 + rnd() * 5){ g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke(); }
+      g.restore(); g.strokeStyle = 'rgba(90,60,30,0.5)'; g.lineWidth = 1.5; g.strokeRect(i * s, j * s, s, s);
+    }
+  });
+  T.end.wrapS = T.end.wrapT = THREE.RepeatWrapping; T.end.repeat.set(6.75 / 12, 12.625 / 12);
+
+  const M = (o) => new THREE.MeshStandardMaterial(Object.assign({ roughness:0.78, metalness:0 }, o));
+  const tints = [0xffffff, 0xe9e3dc, 0xf7f0e6, 0xdad3cc];
+  const charMats = tints.map(c => M({ map:T.char, color:c, roughness:0.92 }));
+  const natMats = tints.map(c => M({ map:T.nat, color:c, roughness:0.7 }));
+  const mat = {
+    walnut: M({ map:T.walnut, roughness:0.6 }),
+    front: M({ map:T.front, roughness:0.62 }),
+    block: M({ map:T.block, roughness:0.55 }),
+    endgrain: M({ map:T.end, roughness:0.6 }),
+    black: M({ color:0x141312, roughness:0.9 }),
+    ply: M({ color:0xe6d6b8, roughness:0.8 }),
+    plyIn: M({ color:0xcbb998, roughness:0.85 }),
+    kick: M({ color:0x1b1a19, roughness:0.9 }),
+    floor: M({ map:T.tile, roughness:0.4 }),
+    wood: M({ color:0x5b3e2a, roughness:0.6 }),
+    cab: M({ color:0x7a5133, roughness:0.7 }),
+    ctop: M({ color:0xe8e0d0, roughness:0.5 }),
+    steel: M({ color:0xb9bdc1, roughness:0.35, metalness:0.6 }),
+    stove: M({ color:0x1d1d1f, roughness:0.3 }),
+    fridge: M({ color:0xf0f0ec, roughness:0.4 }),
+    seat: M({ color:0xcfb488, roughness:0.6 }),
+    metal: M({ color:0x2a2a2a, roughness:0.4, metalness:0.5 }),
+    wall: new THREE.MeshStandardMaterial({ color:0xf4f2ee, transparent:true, opacity:0.18, depthWrite:false, side:THREE.DoubleSide })
+  };
+
+  function B(x0, x1, y0, y1, z0, z1, m, shadow = true){
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m);
+    mesh.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+    mesh.castShadow = shadow; mesh.receiveShadow = true; return mesh;
+  }
+
+  // ---------- floor & context (inches; X = length 0..158, Z = width 0..133) ----------
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(158, 133), mat.floor);
+  floor.rotation.x = -Math.PI / 2; floor.position.set(79, 0, 66.5); floor.receiveShadow = true; world.add(floor);
+  const woodF = new THREE.Mesh(new THREE.PlaneGeometry(70, 133), mat.wood);
+  woodF.rotation.x = -Math.PI / 2; woodF.position.set(193, 0, 66.5); woodF.receiveShadow = true; world.add(woodF);
+  const under = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), mat.floor); // floor under existing counters
+  under.rotation.x = -Math.PI/2; under.position.set(79, -0.05, -15); world.add(under);
+
+  const ctx = new THREE.Group(); world.add(ctx);
+  // stove-side run (Z -25..0)
+  ctx.add(B(25, 68, 0, 34.5, -25, 0, mat.cab), B(98, 128, 0, 34.5, -25, 0, mat.cab));
+  ctx.add(B(24, 68, 34.5, 36, -26, 0.5, mat.ctop), B(98, 128.5, 34.5, 36, -26, 0.5, mat.ctop));
+  ctx.add(B(68, 98, 0, 36, -26, 0, mat.stove), B(68.5, 97.5, 6, 30, 0, 0.6, mat.steel), B(68, 98, 36, 42, -27, -24, mat.stove));
+  ctx.add(B(128.5, 158, 0, 68, -30, 0, mat.fridge));
+  // sink run (X -25..0)
+  ctx.add(B(-25, 0, 0, 34.5, -25, 80, mat.cab), B(-26, 0.5, 34.5, 36, -26, 80, mat.ctop));
+  // translucent walls
+  ctx.add(B(0, 158, 0, 84, 133, 135, mat.wall, false));
+
+  // ---------- island ----------
+  const island = new THREE.Group(); world.add(island);
+  // counter: X 42..117.5, Z 44.5..85.75
+  const bayG = new THREE.Group(); island.add(bayG);
+  // walnut leg under the double-overhang corner
+  island.add(B(114.5, 117, 0, 34.5, 82.75, 85.25, mat.walnut), B(114.5, 117, 0, 34.5, 45, 47.5, mat.walnut));
+  // toe kick
+  island.add(B(73, 101, 0, 4, 49.25, 69.25, mat.kick)); bayG.add(B(53, 73, 0, 4, 49.25, 69.25, mat.kick));
+  // carcasses: 27" (44.25..71.25) and 30" (71.25..101.25), Z 46.25..69.5, Y 4..34.5
+  function carcass(xa, xb, shelf){
+    const g = new THREE.Group();
+    g.add(B(xa, xa + 0.75, 4, 34.5, 46.25, 69.5, mat.ply), B(xb - 0.75, xb, 4, 34.5, 46.25, 69.5, mat.ply));
+    const top = B(xa + 0.75, xb - 0.75, 33.75, 34.5, 46.25, 69.5, mat.ply); top.userData.top = true;
+    g.add(B(xa + 0.75, xb - 0.75, 4, 4.75, 46.25, 69.5, mat.ply), top);
+    g.add(B(xa + 0.75, xb - 0.75, 4.75, 33.75, 68.75, 69.5, mat.plyIn));
+    if (shelf) g.add(B(xa + 0.75, xb - 0.75, 18.6, 19.35, 47, 68.75, mat.ply));
+    return g;
+  }
+  // side cladding backing + slats
+  const slats = [];
+  function slatRun(axis, from, to, fixedA, fixedB){
+    const w = 2, L = to - from, n = Math.max(2, Math.round((L + 0.25) / (w + 0.25))), gap = (L - n * w) / (n - 1);
+    for (let i = 0; i < n; i++){
+      const a = from + i * (w + gap), k = Math.floor(rnd() * 4);
+      const m = axis === 'x' ? B(a, a + w, 0, 34.5, fixedA, fixedB, charMats[k]) : B(fixedA, fixedB, 0, 34.5, a, a + w, charMats[k]);
+      m.userData.k = k; slats.push(m); island.add(m);
+    }
+  }
+  island.add(B(101.25, 101.75, 0, 34.5, 47, 69.5, mat.black));
+  island.add(B(44.5, 101, 0, 34.5, 69.5, 70, mat.black));
+  slatRun('z', 47, 69.25, 101.75, 102.5);
+  slatRun('x', 44.5, 101, 70, 70.75);
+  // walnut corner posts 1.5 x 1.5
+  [[43, 44.5, 45.5, 47], [101, 102.5, 45.5, 47], [43, 44.5, 69.25, 70.75], [101, 102.5, 69.25, 70.75]]
+    .forEach(p => island.add(B(p[0], p[1], 0, 34.5, p[2], p[3], mat.walnut)));
+
+  // open shelves at the sink end: 10" deep, opening on the end face (X 43..53)
+  // open on the end AND on the cooking side: walnut apron + post frame the front opening
+  bayG.add(B(44.5, 53, 0, 34.5, 68.75, 69.5, mat.ply));
+  bayG.add(B(44.5, 53, 29.5, 34.5, 45.5, 46.25, mat.walnut));
+  bayG.add(B(51.5, 53, 0, 29.5, 45.5, 47, mat.walnut));
+  bayG.add(B(44, 53, 0, 3.25, 47.5, 68.75, mat.kick));
+  [3.25, 12.5, 21.5].forEach(y => bayG.add(B(43.5, 51.5, y, y + 0.75, 46, 68.75, mat.front)));
+  const basket = M({ color:0xb08a55, roughness:0.95 });
+  [4].forEach(y => { bayG.add(B(44.5, 52, y, y + 7, 47.75, 57.5, basket), B(44.5, 52, y, y + 7, 58.25, 68, basket)); });
+  bayG.add(B(45.5, 52, 22.25, 28.75, 49, 51, M({ color:0x6b3a2a, roughness:0.7 })), B(45.5, 52, 22.25, 28, 51.2, 52.6, mat.seat));
+  // produce: squash + watermelon on the 2nd shelf, fruit bowl on the top shelf
+  function sph(r, mtl, x, y, z, sx = 1, sy = 1, sz = 1){
+    const m = new THREE.Mesh(new THREE.SphereGeometry(r, 28, 18), mtl);
+    m.scale.set(sx, sy, sz); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; bayG.add(m); return m;
+  }
+  const melonTex = tex(256, 64, (g, w, h) => {
+    g.fillStyle = '#3e7a35'; g.fillRect(0, 0, w, h); g.fillStyle = '#1f4a1d';
+    for (let i = 0; i < 16; i++){ const x = i * w / 16; g.beginPath(); g.moveTo(x, 0);
+      for (let y = 0; y <= h; y += 8) g.lineTo(x + Math.sin(y * 0.4 + i) * 2.5, y);
+      g.lineTo(x + 7, h); for (let y = h; y >= 0; y -= 8) g.lineTo(x + 7 + Math.sin(y * 0.4 + i) * 2.5, y); g.fill(); }
+  });
+  const S2 = 13.25, S3 = 22.25;
+  const melon = sph(3.6, M({ map:melonTex, roughness:0.45 }), 47.5, S2 + 3.6, 63.3, 1, 1, 1.25); melon.rotation.x = Math.PI / 2;
+  melon.scale.set(1, 1.25, 1);
+  sph(2.1, M({ color:0xdcae6a, roughness:0.55 }), 47.5, S2 + 2.1, 56.3);
+  sph(1.35, M({ color:0xd8aa66, roughness:0.55 }), 47.5, S2 + 1.35, 53.5, 1, 1, 1.7);
+  sph(2.2, M({ color:0x2e4a2c, roughness:0.5 }), 47.5, S2 + 1.9, 49.4, 1, 0.85, 1);
+  const bowlMat = new THREE.MeshStandardMaterial({ color:0xf1ede6, roughness:0.35, side:THREE.DoubleSide });
+  const bowl = new THREE.Mesh(new THREE.CylinderGeometry(3.7, 2.3, 1.8, 36, 1, true), bowlMat);
+  bowl.position.set(47.5, S3 + 0.9, 61); bowl.castShadow = bowl.receiveShadow = true; bayG.add(bowl);
+  const bowlBase = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.3, 0.2, 36), bowlMat); bowlBase.position.set(47.5, S3 + 0.1, 61); bayG.add(bowlBase);
+  const fr = [[0xb32a22, 1.5, 0], [0xe88a1f, 1.45, 1.26], [0x8db33a, 1.4, 2.5], [0xb83a26, 1.45, 3.77], [0xe39424, 1.4, 5.03]];
+  fr.forEach(([c, r, a]) => sph(r, M({ color:c, roughness:0.4 }), 47.5 + Math.cos(a) * 1.7, S3 + 2.1, 61 + Math.sin(a) * 1.7));
+  sph(1.4, M({ color:0xc9b245, roughness:0.45 }), 47.5, S3 + 3.7, 61);
+  // ---- electrical outlets ----
+  const plate = M({ color:0xf3f2ee, roughness:0.4 }), ivory = M({ color:0xe9e5da, roughness:0.45 }), slot = M({ color:0x1c1c1c, roughness:0.6 });
+  const alu = M({ color:0x9ea3a8, roughness:0.35, metalness:0.6 }), blk = M({ color:0x151515, roughness:0.5 });
+  // 1) duplex in the walnut rail at the sink end (outer face, X = 43), just off-centre toward the cooking side
+  //    so its box (behind the rail) clears the stainless pan and its cleats
+  bayG.add(B(42.8, 43, 29.75, 34.25, 47.6, 50.35, plate));
+  [30.4, 32.4].forEach(y => {
+    bayG.add(B(42.7, 42.8, y, y + 1.4, 48.3, 49.65, ivory));
+    bayG.add(B(42.65, 42.7, y + 0.45, y + 0.95, 48.6, 48.72, slot), B(42.65, 42.7, y + 0.45, y + 0.95, 49.23, 49.35, slot));
+  });
+  // steel flat bars ½" x 3" x 24", notched ½" into the carcass side tops, 8½" over the carcass + 15" under the overhang
+  const steelBar = M({ color:0x1d1e20, roughness:0.45, metalness:0.7 });
+  [53.36, 77.125, 100.9].forEach(x => island.add(B(x - 1.5, x + 1.5, 34, 34.5, 61.75, 85.25, steelBar)));
+  // 2) under-counter power strip in the fridge-end overhang, near the cooking-side corner, outlets + USB facing the end
+  island.add(B(102.75, 104.25, 33.1, 34.5, 48, 68, alu));
+  [51, 55, 59].forEach(z => island.add(B(104.25, 104.35, 33.3, 34.3, z - 0.8, z + 0.8, blk)));
+  [63, 65].forEach(z => island.add(B(104.25, 104.32, 33.6, 33.9, z - 0.4, z + 0.4, blk)));
+
+  // built-in 1/3 hotel pan (6⅞ x 12¾, 4" deep) over the end shelves; hole through the counter,
+  // rim on cleats under the counter, 1½" end-grain cover resting on the rim, flush with the top
+  const steel2 = M({ color:0xc3c7cb, roughness:0.25, metalness:0.8 });
+  const PX0 = 44.75, PX1 = 51.625, PZ0 = 51.5, PZ1 = 64.25;
+  const holed = new THREE.Group(), solidA = new THREE.Group(), panG = new THREE.Group();
+  bayG.add(solidA, holed); holed.add(panG); holed.visible = false;
+  // one-piece counter (X 42..117.5, Z 44.5..85.75), optional hole; UVs in inches so the strips stay continuous
+  const tW = T.block.clone(); tW.wrapS = tW.wrapT = THREE.RepeatWrapping; tW.repeat.set(1 / 75.5, 1 / 42); tW.needsUpdate = true;
+  const blockW = mat.block.clone(); blockW.map = tW;
+  function counterMesh(hole){
+    const sh = new THREE.Shape();
+    // corner radii: sink end 3", fridge end 1½" (clears the walnut legs)
+    const rs = S.round ? 3 : 0, rf = S.round ? 1.5 : 0, X0 = 42, X1 = 117.5, Y0 = -44.5, Y1 = -85.75;
+    sh.moveTo(X0 + rs, Y0); sh.lineTo(X1 - rf, Y0);
+    if (rf) sh.absarc(X1 - rf, Y0 - rf, rf, Math.PI / 2, 0, true);
+    sh.lineTo(X1, Y1 + rf);
+    if (rf) sh.absarc(X1 - rf, Y1 + rf, rf, 0, -Math.PI / 2, true);
+    sh.lineTo(X0 + rs, Y1);
+    if (rs) sh.absarc(X0 + rs, Y1 + rs, rs, -Math.PI / 2, -Math.PI, true);
+    sh.lineTo(X0, Y0 - rs);
+    if (rs) sh.absarc(X0 + rs, Y0 - rs, rs, Math.PI, Math.PI / 2, true);
+    if (hole){ const h = new THREE.Path(); h.moveTo(PX0, -PZ0); h.lineTo(PX0, -PZ1); h.lineTo(PX1, -PZ1); h.lineTo(PX1, -PZ0); h.closePath(); sh.holes.push(h); }
+    const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth:1.5, bevelEnabled:false }), blockW);
+    m.rotation.x = -Math.PI / 2; m.position.y = 34.5; m.castShadow = m.receiveShadow = true; return m;
+  }
+  let cS = counterMesh(false), cH = counterMesh(true); solidA.add(cS); holed.add(cH);
+  function rebuildCounter(){
+    solidA.remove(cS); holed.remove(cH); cS.geometry.dispose(); cH.geometry.dispose();
+    cS = counterMesh(false); cH = counterMesh(true); solidA.add(cS); holed.add(cH);
+  }
+  const IX0 = PX0 + 0.4, IX1 = PX1 - 0.4, IZ0 = PZ0 + 0.4, IZ1 = PZ1 - 0.4;
+  panG.add(B(PX0, PX1, 34.25, 34.5, PZ0, IZ0, steel2), B(PX0, PX1, 34.25, 34.5, IZ1, PZ1, steel2));
+  panG.add(B(PX0, IX0, 34.25, 34.5, IZ0, IZ1, steel2), B(IX1, PX1, 34.25, 34.5, IZ0, IZ1, steel2));
+  panG.add(B(IX0, IX1, 30.5, 30.6, IZ0, IZ1, steel2));
+  panG.add(B(IX0, IX0 + 0.06, 30.5, 34.25, IZ0, IZ1, steel2), B(IX1 - 0.06, IX1, 30.5, 34.25, IZ0, IZ1, steel2));
+  panG.add(B(IX0, IX1, 30.5, 34.25, IZ0, IZ0 + 0.06, steel2), B(IX0, IX1, 30.5, 34.25, IZ1 - 0.06, IZ1, steel2));
+  panG.add(B(PX0 - 0.25, PX1 + 0.25, 33.5, 34.25, PZ0 - 0.75, PZ0, mat.ply), B(PX0 - 0.25, PX1 + 0.25, 33.5, 34.25, PZ1, PZ1 + 0.75, mat.ply));
+  bayG.add(B(43, 43.75, 29.5, 34.5, 47, 69.25, mat.walnut));
+  const cover = B(PX0 + 0.0625, PX1 - 0.0625, 34.5, 36, PZ0 + 0.0625, PZ1 - 0.0625, mat.endgrain); holed.add(cover);
+  function setPan(v){
+    solidA.visible = v === 'non'; holed.visible = v !== 'non';
+    if (v === 'ouvert'){ cover.position.set(62, 36.75, 56); cover.rotation.y = 0.35; }
+    else { cover.position.set((PX0 + PX1) / 2, 35.25, (PZ0 + PZ1) / 2); cover.rotation.y = 0; }
+    document.getElementById('pl-pan').hidden = v === 'non';
+  }
+
+  // fronts (face -Z, plane Z 45.5..46.25)
+  const fronts = new THREE.Group(); island.add(fronts);
+  const REG = [[53.0625, 76.9375], [77.0625, 100.9375]];
+  const FY0 = 4.25, FY1 = 34.25, GAP = 0.125;
+  function drawers(xa, xb, ratios, topGroup, base){
+    base = base || fronts;
+    const avail = (FY1 - FY0) - GAP * (ratios.length - 1), sum = ratios.reduce((a, b) => a + b, 0);
+    let y = FY1;
+    ratios.forEach((r, i) => {
+      const hgt = avail * r / sum, dest = (i === 0 && topGroup) ? topGroup : base;
+      dest.add(B(xa, xb, y - hgt, y, 45.5, 46.25, mat.front));
+      const cx = (xa + xb) / 2, py = y - Math.min(2.2, hgt / 2);
+      dest.add(B(cx - 3.5, cx + 3.5, py - 0.35, py + 0.35, 44.7, 45.5, mat.walnut));
+      y -= hgt + GAP;
+    });
+  }
+  // utensil drawer box with diagonal dividers (30" cabinet, fridge side)
+  function utensilBox(g){
+    const X0 = 78.375, X1 = 100, Z0 = 46.75, Z1 = 67.75, Y0 = 28.75, Y1 = 33.25;
+    g.add(B(X0, X0 + 0.5, Y0, Y1, Z0, Z1, mat.ply), B(X1 - 0.5, X1, Y0, Y1, Z0, Z1, mat.ply));
+    g.add(B(X0 + 0.5, X1 - 0.5, Y0, Y1, Z0, Z0 + 0.5, mat.ply), B(X0 + 0.5, X1 - 0.5, Y0, Y1, Z1 - 0.5, Z1, mat.ply));
+    g.add(B(X0 + 0.5, X1 - 0.5, Y0, Y0 + 0.25, Z0 + 0.5, Z1 - 0.5, mat.plyIn));
+    const x0 = X0 + 0.5, x1 = X1 - 0.5, z0 = Z0 + 0.5, z1 = Z1 - 0.5, th = Math.PI / 6;
+    const nx = Math.cos(th), nz = -Math.sin(th);
+    const cs = [[x0, z0], [x1, z0], [x0, z1], [x1, z1]].map(([x, z]) => nx * x + nz * z);
+    const cmin = Math.min(...cs), cmax = Math.max(...cs);
+    for (let c = cmin + 3.6; c < cmax - 1.5; c += 3.6){
+      const pts = [];
+      [x0, x1].forEach(x => { const z = (c - nx * x) / nz; if (z >= z0 - 1e-6 && z <= z1 + 1e-6) pts.push([x, z]); });
+      [z0, z1].forEach(z => { const x = (c - nz * z) / nx; if (x >= x0 - 1e-6 && x <= x1 + 1e-6) pts.push([x, z]); });
+      if (pts.length < 2) continue;
+      const [a, b] = pts, dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz);
+      if (L < 2) continue;
+      const d = new THREE.Mesh(new THREE.BoxGeometry(0.375, 3.25, L), mat.front);
+      d.position.set((a[0] + b[0]) / 2, Y0 + 0.25 + 1.625, (a[1] + b[1]) / 2);
+      d.rotation.y = Math.atan2(dx, dz); d.castShadow = d.receiveShadow = true; g.add(d);
+    }
+  }
+  function doors(xa, xb){
+    const mid = (xa + xb) / 2;
+    fronts.add(B(xa, mid - GAP / 2, FY0, FY1, 45.5, 46.25, mat.front), B(mid + GAP / 2, xb, FY0, FY1, 45.5, 46.25, mat.front));
+    fronts.add(B(mid - 1.6, mid - 1, 26, 32, 44.7, 45.5, mat.walnut), B(mid + 1, mid + 1.6, 26, 32, 44.7, 45.5, mat.walnut));
+  }
+  function buildFronts(){
+    while (fronts.children.length){ const c = fronts.children.pop(); c.traverse(o => o.geometry && o.geometry.dispose()); }
+    frontA = new THREE.Group(); fronts.add(frontA);
+    frontA.add(carcass(53, 77.125, false)); fronts.add(carcass(77.125, 101.25, false));
+    drawers(REG[0][0], REG[0][1], [6, 10, 13], null, frontA);
+    ut = new THREE.Group(); fronts.add(ut);
+    drawers(REG[1][0], REG[1][1], [6, 10, 13], ut);
+    utensilBox(ut);
+  }
+  let ut, frontA;
+  buildFronts();
+
+  // stools
+  const stools = new THREE.Group(); world.add(stools);
+  function stool(x, z){
+    const g = new THREE.Group();
+    const seat = new THREE.Mesh(new THREE.CylinderGeometry(7.5, 7.5, 1.5, 40), mat.seat); seat.position.set(0, 23.75, 0);
+    g.add(seat);
+    [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([a, b]) => { const l = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 23, 10), mat.metal); l.position.set(a * 5.2, 11.5, b * 5.2); g.add(l); });
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(7.35, 0.35, 8, 40), mat.metal); ring.rotation.x = Math.PI / 2; ring.position.y = 8; g.add(ring);
+    g.traverse(o => { if (o.isMesh){ o.castShadow = true; o.receiveShadow = true; } });
+    g.position.set(x, 0, z); stools.add(g);
+  }
+  stool(43.5, 91.7); stool(73.5, 91.7); stool(103.5, 91.7); stool(125.7, 65);
+
+  // ---------- views ----------
+  const target = new THREE.Vector3(78.25, 17, 65);
+  const VIEWS = { cuisine:[8, 78, -38], tabourets:[136, 72, 178], dessus:[78.25, 245, 66.5],
+    prise1:[140, 32, 40, 115, 32, 49], prise2:[26, 22, 34, 54.5, 33.8, 58] };
+  function setView(v){ const p = VIEWS[v]; camera.position.set(p[0], p[1], p[2]);
+    if (p.length > 3) controls.target.set(p[3], p[4], p[5]); else controls.target.copy(target); controls.update(); }
+  setView('cuisine');
+
+  function resize(){ const r = host.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / Math.max(1, r.height); camera.updateProjectionMatrix(); }
+  new ResizeObserver(resize).observe(host); resize();
+  (function loop(){ controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop); })();
+
+  // ---------- UI ----------
+  function radio(group, cb){
+    const btns = document.querySelectorAll('[data-group="' + group + '"] button');
+    btns.forEach(b => b.addEventListener('click', () => { btns.forEach(x => x.setAttribute('aria-pressed', String(x === b))); cb(b.dataset.v); }));
+  }
+  radio('view', setView);
+  radio('ut', v => { ut.position.z = v === '1' ? -16 : 0; });
+  radio('pan', setPan);
+  radio('acc', v => { const b = v === 'brule'; mat.walnut.map = b ? T.char : T.walnut; mat.walnut.roughness = b ? 0.92 : 0.6; mat.walnut.needsUpdate = true; });
+  radio('round', v => { S.round = v === '1'; rebuildCounter(); document.getElementById('plan-top').setAttribute('rx', S.round ? 6 : 0); });
+  radio('char', v => { S.char = v === '1'; slats.forEach(m => m.material = (S.char ? charMats : natMats)[m.userData.k]); });
+  function toggle(id, cb){ const b = document.getElementById(id); b.addEventListener('click', () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); cb(on); }); }
+  toggle('t-stools', on => stools.visible = on);
+  toggle('t-ctx', on => ctx.visible = on);
+})();
+</script>
+
+</html>
