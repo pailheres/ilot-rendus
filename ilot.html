@@ -714,6 +714,9 @@ dd{margin:0;font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabu
   function toggle(id, cb){ const b = document.getElementById(id); b.addEventListener('click', () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); cb(on); }); }
   toggle('t-stools', on => stools.visible = on);
   toggle('t-ctx', on => ctx.visible = on);
+  // default selection: rounded corners + burnt-wood posts, legs and pulls
+  document.getElementById('r-rond').click();
+  document.getElementById('a-brule').click();
 })();
 </script>
 
